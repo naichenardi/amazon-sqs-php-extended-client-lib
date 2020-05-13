@@ -1,10 +1,10 @@
 {
-  "name": "e0ipso/amazon-sqs-php-extended-client-lib",
+  "name": "naichenardi/amazon-sqs-php-extended-client-lib",
   "description": "An extension to the Amazon SQS client that enables sending and receiving messages up to 2GB via Amazon S3.",
   "keywords": ["aws", "sqs", "s3", "amazon"],
-  "homepage": "https://github.com/e0ipso/amazon-sqs-php-extended-client-lib",
+  "homepage": "https://github.com/naichenardi/amazon-sqs-php-extended-client-lib",
   "require": {
-    "php": ">=5.6",
+    "php": ">=7.1",
     "aws/aws-sdk-php": "^3.18",
     "ramsey/uuid": "^3.4"
   },
@@ -19,8 +19,8 @@
   },
   "authors": [
     {
-      "name": "Mateu Aguiló Bosch",
-      "email": "mateu.aguilo.bosch@gmail.com"
+      "name": "Naiche Nardi",
+      "email": "naiche.nardi@gmail.com"
     }
   ]
 }

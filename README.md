@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/e0ipso/amazon-sqs-php-extended-client-lib.svg?branch=master)](https://travis-ci.org/e0ipso/amazon-sqs-php-extended-client-lib)
+[![Build Status](https://travis-ci.org/naichenardi/amazon-sqs-php-extended-client-lib.svg?branch=master)](https://travis-ci.org/naichenardi/amazon-sqs-php-extended-client-lib.svg?branch=master)
 
 Amazon SQS Extended Client Library for PHP
 ==========================================
@@ -12,7 +12,7 @@ The **Amazon SQS Extended Client Library for PHP** enables you to manage Amazon 
 You can install this library using composer doing:
 
 ```
-composer require e0ipso/amazon-sqs-php-extended-client-lib
+composer require naichenardi/amazon-sqs-php-extended-client-lib
 ```
 
 ## Getting Started
@@ -25,5 +25,5 @@ composer require e0ipso/amazon-sqs-php-extended-client-lib
 * This library is inspired by the [very similar Java library](https://github.com/awslabs/amazon-sqs-java-extended-client-lib).
 
 ## Feedback
-* Give us feedback [here](https://github.com/e0ipso/amazon-sqs-php-extended-client-lib/issues).
+* Give us feedback [here](https://github.com/naichenardi/amazon-sqs-php-extended-client-lib/issues).
 * If you'd like to contribute a new feature or bug fix, we'd love to see Github pull requests from you.
