@@ -2,29 +2,31 @@
 
 namespace AwsExtended;
 
+use Aws\ResultInterface;
 use Aws\S3\S3Client;
-use Aws\Sqs\SqsClient as AwsSqsClient;
-use Ramsey\Uuid\Uuid;
 
-interface SqsClientInterface {
+interface SqsExtendedClientInterface {
 
   /**
    * The maximum size that SQS can accept.
    */
   const MAX_SQS_SIZE_KB = 256;
 
-    /**
-     * Sends the message to SQS.
-     *
-     * If the message cannot fit SQS, it gets stored in S3 and a pointer is sent
-     * to SQS.
-     *
-     * @param array $args = [MessageBody => '', QueueUrl => NULL, MessageGroupId => NULL]
-     *
-     * @return \Aws\ResultInterface
-     *   The result of the transaction.
-     */
-  public function sendMessage(array $args = []);
+  /**
+   * Sends the message to SQS.
+   *
+   * If the message cannot fit SQS, it gets stored in S3 and a pointer is sent
+   * to SQS.
+   *
+   * @param $message
+   *   The message to send.
+   * @param string $groupId
+   *   The SQS fifo group id. Defaults to the one configured in the client.
+   *
+   * @return ResultInterface
+   *   The result of the transaction.
+   */
+  public function sendMessage($message, $groupId = NULL);
 
   /**
    * Gets a message from the queue.
@@ -32,7 +34,7 @@ interface SqsClientInterface {
    * @param string $queue_url
    *   The SQS queue. Defaults to the one configured in the client.
    *
-   * @return \Aws\ResultInterface
+   * @return ResultInterface
    *   The message
    */
   public function receiveMessage($queue_url = NULL);
@@ -53,7 +55,7 @@ interface SqsClientInterface {
   /**
    * Gets the underlying SQS client.
    *
-   * @return \Aws\Sqs\SqsClient
+   * @return SqsExtendedExtendedClient
    *   The underlying SQS client.
    */
   public function getSqsClient();
@@ -61,7 +63,7 @@ interface SqsClientInterface {
   /**
    * Gets the underlying S3 client.
    *
-   * @return \Aws\S3\S3Client
+   * @return S3Client
    *   The underlying S3 client.
    */
   public function getS3Client();
@@ -69,7 +71,7 @@ interface SqsClientInterface {
   /**
    * Sets the config.
    *
-   * @param \AwsExtended\ConfigInterface $config
+   * @param ConfigInterface $config
    */
   public function setConfig($config);
 

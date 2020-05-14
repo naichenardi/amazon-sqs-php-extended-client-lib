@@ -12,77 +12,97 @@ use Prophecy\Argument;
  *
  * @package AwsExtended
  *
- * @coversDefaultClass \AwsExtended\SqsClient
+ * @coversDefaultClass \AwsExtended\SqsExtendedExtendedClient
  */
 class SqsClientTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var \AwsExtended\SqsClientInterface
+     * @var \AwsExtended\SqsExtendedClientInterface
      */
     protected $client;
+
+    /** @var array */
+    private $requestArray;
+
+    private $bucketName = 'bucket-name';
+    private $queueUrl = 'queue.name';
+    private $messageGroupId = 'groupId';
+
 
     /**
      * @covers ::sendMessage
      */
-    public function testSendMessage()
+    public function testSendMessageNeverSendWithS3()
     {
-//        $queueUrl = 'foo';
-//        $rawMessage = 'bar';
-//        $messageGroupId = 'groupId';
-//        $requestArray = [
-//            'QueueUrl'       => $queueUrl,
-//            'MessageBody'    => $rawMessage,
-//            'MessageGroupId' => $messageGroupId
-//        ];
-//
-//        $client = $this->getClientMock(new Config(
-//            [],
-//            'lorem',
-//            'ipsum',
-//            ConfigInterface::NEVER
-//        ));
-//        $response = $client->sendMessage($requestArray);
-//        $this->assertEquals([
-//            'QueueUrl'       => $queueUrl,
-//            'MessageBody'    => $rawMessage,
-//            'MessageGroupId' => $messageGroupId
-//        ], $response);
-//
-//        $client = $this->getClientMock(new Config(
-//            [],
-//            'lorem',
-//            'ipsum',
-//            ConfigInterface::IF_NEEDED
-//        ));
-//        // Our mock returns the arguments passed to the AWS class.
-//        $response = $client->sendMessage($requestArray);
-//        $this->assertEquals([
-//            'QueueUrl' => 'bar',
-//            'MessageBody' => 'foo',
-//        ], $response);
-//        $response = $client->sendMessage(
-//            [
-//                'QueueUrl' => $queueUrl,
-//                'MessageBody' => json_encode(range(1, 257 * 1024)),
-//                'MessageGroupId' => $messageGroupId
-//            ]);
-//        $this->assertEquals([
-//            'QueueUrl' => 'bar',
-//            'MessageBody' => '[[{"Lorem":"lorem","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"lorem","s3Key":"1234-fake-uuid.json"}]',
-//        ], $response);
-//
-//        $client = $this->getClientMock(new Config(
-//            [],
-//            'lorem',
-//            'ipsum',
-//            ConfigInterface::ALWAYS
-//        ));
-//        $response = $client->sendMessage($requestArray);
-//        $this->assertEquals([
-//            'QueueUrl' => 'bar',
-//            'MessageBody' => '[[{"Lorem":"lorem","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"lorem","s3Key":"1234-fake-uuid.json"}]',
-//        ], $response);
+        $rawMessage = json_encode(['name' => 'Donald Trump', 'country' => 'USA']);
+
+        $client = $this->getClientMock(new Config(
+            [],
+            $this->bucketName,
+            $this->queueUrl,
+            ConfigInterface::NEVER
+        ));
+
+        $response = $client->sendMessage($rawMessage, $this->messageGroupId);
+
+        $this->assertEquals([
+            'QueueUrl' => 'queue.name',
+            'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
+            'MessageGroupId' => 'groupId'
+        ], $response);
+    }
+
+    public function testSendMessageIfNeededSendWithS3()
+    {
+        $rawMessage = json_encode(['name' => 'Donald Trump', 'country' => 'USA']);
+
+        $client = $this->getClientMock(new Config(
+            [],
+            $this->bucketName,
+            $this->queueUrl,
+            ConfigInterface::IF_NEEDED
+        ));
+
+        // Our mock returns the arguments passed to the AWS class.
+        $response = $client->sendMessage($rawMessage, $this->messageGroupId);
+
+        $responseToBig = $client->sendMessage(json_encode(range(1, 257 * 1024)), $this->messageGroupId);
+
+        $this->assertEquals([
+            'QueueUrl' => 'queue.name',
+            'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
+            'MessageGroupId' => 'groupId'],
+            $response);
+        $this->assertEquals([
+            'QueueUrl' => 'queue.name',
+            'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
+            'MessageGroupId' => 'groupId'],
+            $responseToBig);
+    }
+
+    /**
+     * @covers ::sendMessage
+     */
+    public function testSendMessageAlwaysSendWithS3AndWithoutMessageGroup()
+    {
+
+        $rawMessage = json_encode(['name' => 'Donald Trump', 'country' => 'USA']);
+
+        $client = $this->getClientMock(new Config(
+            [],
+            $this->bucketName,
+            $this->queueUrl,
+            ConfigInterface::ALWAYS
+        ));
+
+        $response = $client->sendMessage($rawMessage);
+
+        $this->assertEquals([
+            'QueueUrl' => 'queue.name',
+            'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
+            'MessageGroupId' => NULL],
+            $response);
     }
 
     /**
@@ -94,7 +114,7 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
     protected function getClientMock(ConfigInterface $config)
     {
         // Mock the AWS clients.
-        $client = $this->getMockBuilder(SqsClient::class)
+        $client = $this->getMockBuilder(SqsExtendedExtendedClient::class)
             ->setMethods(['getS3Client', 'getSqsClient', 'generateUuid'])
             ->setConstructorArgs([$config])
             ->getMock();
@@ -122,10 +142,10 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsTooBig($message, $is_too_big)
     {
-        $client = new SqsClient(new Config(
+        $client = new SqsExtendedExtendedClient(new Config(
             [],
-            'lorem',
-            'ipsum',
+            $this->bucketName,
+            $this->queueUrl,
             ConfigInterface::NEVER
         ));
         // Data with more than 2 bytes is considered too big.

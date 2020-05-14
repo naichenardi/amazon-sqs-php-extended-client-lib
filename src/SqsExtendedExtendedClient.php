@@ -4,7 +4,6 @@ namespace AwsExtended;
 
 use Aws\S3\S3Client;
 use Aws\Sdk;
-use Aws\Sqs\SqsClient as AwsSqsClient;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -12,34 +11,34 @@ use Ramsey\Uuid\Uuid;
  *
  * @package AwsExtended
  */
-class SqsClient implements SqsClientInterface
+class SqsExtendedExtendedClient implements SqsExtendedClientInterface
 {
 
     /**
      * The AWS client to push messages to SQS.
      *
-     * @var \Aws\Sqs\SqsClient
+     * @var SqsExtendedExtendedClient
      */
     protected $sqsClient;
 
     /**
      * The S3 client to interact with AWS.
      *
-     * @var \Aws\S3\S3Client
+     * @var S3Client
      */
     protected $s3Client;
 
     /**
      * The configuration object containing all the options.
      *
-     * @var \AwsExtended\ConfigInterface
+     * @var ConfigInterface
      */
     protected $config;
 
     /**
      * The client factory.
      *
-     * @var \Aws\Sdk
+     * @var Sdk
      */
     protected $clientFactory;
 
@@ -134,7 +133,6 @@ class SqsClient implements SqsClientInterface
      */
     function __call($name, $arguments)
     {
-        // Send any unknown method calls to the SQS client.
         return call_user_func_array([$this->getSqsClient(), $name], $arguments);
     }
 
@@ -143,6 +141,7 @@ class SqsClient implements SqsClientInterface
      *
      * @return string
      *   The uuid.
+     * @throws \Exception
      */
     protected function generateUuid()
     {
@@ -152,7 +151,7 @@ class SqsClient implements SqsClientInterface
     /**
      * Initialize and return the SDK client factory.
      *
-     * @return \Aws\Sdk
+     * @return Sdk
      *   The client factory.
      */
     protected function getClientFactory()
@@ -167,11 +166,8 @@ class SqsClient implements SqsClientInterface
     /**
      * {@inheritdoc}
      */
-    public function sendMessage(array $args = [])
+    public function sendMessage($message, $messageGroupId = NULL)
     {
-        $queue_url = $args['QueueUrl'];
-        $message = $args['MessageBody'];
-        $messageGroupId = $args['MessageGroupId'];
 
         switch ($this->config->getSendToS3()) {
             case ConfigInterface::ALWAYS:
@@ -199,7 +195,8 @@ class SqsClient implements SqsClientInterface
             // Swap the message for a pointer to the actual message in S3.
             $message = (string)(new S3Pointer($this->config->getBucketName(), $key, $receipt));
         }
-        $queue_url = $queue_url ?: $this->config->getSqsUrl();
+
+        $queue_url = $this->config->getSqsUrl();
 
         return $this->getSqsClient()->sendMessage([
             'QueueUrl' => $queue_url,

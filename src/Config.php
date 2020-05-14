@@ -41,7 +41,7 @@ class Config implements ConfigInterface {
    *   Client configuration arguments. The same arguments passed to AwsClient.
    * @param string $bucket_name
    *   The name of the S3 bucket to send the data to.
-   * @param string $sqs_url
+   * @param string $queue_url
    *   The SQS url to push messages to.
    * @param string $send_to_s3
    *   Code that indicates when to send data to S3. Allowed values are:
@@ -52,13 +52,13 @@ class Config implements ConfigInterface {
    * @throws \InvalidArgumentException if any required options are missing or
    * the service is not supported.
    */
-  public function __construct(array $config, $bucket_name, $sqs_url = NULL, $send_to_s3 = NULL) {
+  public function __construct(array $config, $bucket_name, $queue_url = NULL, $send_to_s3 = NULL) {
     $this->config = $config;
     $this->bucketName = $bucket_name;
-    if ($sqs_url) {
-      $this->sqsUrl = $sqs_url;
+    if ($queue_url) {
+      $this->sqsUrl = $queue_url;
     }
-    $this->sqsUrl = $sqs_url;
+    $this->sqsUrl = $queue_url;
     if ($send_to_s3) {
       if (!in_array($send_to_s3, [self::ALWAYS, self::IF_NEEDED, self::NEVER])) {
         throw new \InvalidArgumentException(sprintf('Invalid code for send_to_s3: %s.', $send_to_s3));
