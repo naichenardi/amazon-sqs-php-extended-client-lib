@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/naichenardi/amazon-sqs-php-extended-client-lib.svg?branch=master)](https://travis-ci.org/naichenardi/amazon-sqs-php-extended-client-lib.svg?branch=master)
+[![CircleCI](https://circleci.com/gh/naichenardi/amazon-sqs-php-extended-client-lib.svg?style=svg)](https://app.circleci.com/pipelines/github/naichenardi/amazon-sqs-php-extended-client-lib)
 
 Amazon SQS Extended Client Library for PHP
 ==========================================
