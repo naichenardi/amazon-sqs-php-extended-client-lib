@@ -198,10 +198,26 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
 
         $queue_url = $this->config->getSqsUrl();
 
-        return $this->getSqsClient()->sendMessage([
+        $messageRequest = [
             'QueueUrl' => $queue_url,
-            'MessageBody' => $message,
-            'MessageGroupId' => $messageGroupId
-        ]);
+            'MessageBody' => $message
+        ];
+
+        $messageRequest = [];
+        if ($messageGroupId){
+            $messageRequest = [
+                'QueueUrl' => $queue_url,
+                'MessageBody' => $message,
+                'MessageGroupId' => $messageGroupId,
+                'MessageDeduplicationId' => $messageGroupId . "Extended"
+            ];
+        } else {
+            $messageRequest = [
+                'QueueUrl' => $queue_url,
+                'MessageBody' => $message
+            ];
+        }
+
+        return $this->getSqsClient()->sendMessage($messageRequest);
     }
 }

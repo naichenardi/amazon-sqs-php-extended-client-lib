@@ -6,7 +6,7 @@
   "require": {
     "php": ">=7.1.0",
     "aws/aws-sdk-php": "^3.18",
-    "ramsey/uuid": "^3.4"
+    "ramsey/uuid": "^3.4",
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",
@@ -20,8 +20,7 @@
   },
   "authors": [
     {
-      "name": "Naiche Nardi",
-      "email": "naiche.nardi@gmail.com"
+      "name": "Naiche Nardi"
     }
   ]
 }
