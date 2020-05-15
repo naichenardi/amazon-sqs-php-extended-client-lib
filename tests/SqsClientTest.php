@@ -29,13 +29,18 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
     private $queueUrl = 'queue.name';
     private $messageGroupId = 'groupId';
 
-
     /**
      * @covers ::sendMessage
      */
     public function testSendMessageNeverSendWithS3()
     {
         $rawMessage = json_encode(['name' => 'Donald Trump', 'country' => 'USA']);
+
+        $messageRequest = new SendMessageRequest($this->queueUrl . 'fifo', $rawMessage);
+
+        $messageRequest
+            ->withMessageGroupId($this->messageGroupId)
+            ->withMessageDeduplicationId($this->messageGroupId . time());
 
         $client = $this->getClientMock(new Config(
             [],
@@ -44,13 +49,13 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
             ConfigInterface::NEVER
         ));
 
-        $response = $client->sendMessage($rawMessage, $this->messageGroupId);
+        $response = $client->sendMessage($messageRequest);
 
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> base64_encode('groupId')
+            'MessageDeduplicationId'=> $this->messageGroupId . time()
         ], $response);
     }
 
@@ -65,22 +70,31 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
             ConfigInterface::IF_NEEDED
         ));
 
-        // Our mock returns the arguments passed to the AWS class.
-        $response = $client->sendMessage($rawMessage, $this->messageGroupId);
+        $messageRequest = new SendMessageRequest($this->queueUrl, $rawMessage);
 
-        $responseToBig = $client->sendMessage(json_encode(range(1, 257 * 1024)), $this->messageGroupId);
+        $messageRequest
+            ->withMessageGroupId($this->messageGroupId)
+            ->withMessageDeduplicationId($this->messageGroupId . time());
+
+        $response = $client->sendMessage($messageRequest);
+
+        $requestToBig = new SendMessageRequest($this->queueUrl, json_encode(range(1, 257 * 1024)));
+        $requestToBig->withMessageGroupId($this->messageGroupId)
+            ->withMessageDeduplicationId($this->messageGroupId . time());
+
+        $responseToBig = $client->sendMessage($requestToBig);
 
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> base64_encode('groupId')],
+            'MessageDeduplicationId'=> $this->messageGroupId . time()],
             $response);
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> base64_encode('groupId')],
+            'MessageDeduplicationId'=> $this->messageGroupId . time()],
             $responseToBig);
     }
 
@@ -89,7 +103,6 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
      */
     public function testSendMessageAlwaysSendWithS3AndWithoutMessageGroup()
     {
-
         $rawMessage = json_encode(['name' => 'Donald Trump', 'country' => 'USA']);
 
         $client = $this->getClientMock(new Config(
@@ -99,13 +112,14 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
             ConfigInterface::ALWAYS
         ));
 
-        $response = $client->sendMessage($rawMessage);
+        $messageRequest = new SendMessageRequest($this->queueUrl, $rawMessage);
+
+        $response = $client->sendMessage($messageRequest);
 
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]'
-        ],
-            $response);
+        ], $response);
     }
 
     /**

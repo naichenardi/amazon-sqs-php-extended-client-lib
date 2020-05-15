@@ -12,21 +12,17 @@ interface SqsExtendedClientInterface {
    */
   const MAX_SQS_SIZE_KB = 256;
 
-  /**
-   * Sends the message to SQS.
-   *
-   * If the message cannot fit SQS, it gets stored in S3 and a pointer is sent
-   * to SQS.
-   *
-   * @param $message
-   *   The message to send.
-   * @param string $groupId
-   *   The SQS fifo group id. Defaults to the one configured in the client.
-   *
-   * @return ResultInterface
-   *   The result of the transaction.
-   */
-  public function sendMessage($message, $groupId = NULL);
+    /**
+     * Sends the message to SQS.
+     *
+     * If the message cannot fit SQS, it gets stored in S3 and a pointer is sent
+     * to SQS.
+     *
+     * @param SendMessageRequest $messageRequest
+     * @return ResultInterface
+     *   The result of the transaction.
+     */
+  public function sendMessage(SendMessageRequest $messageRequest);
 
   /**
    * Gets a message from the queue.

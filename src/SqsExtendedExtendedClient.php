@@ -165,17 +165,48 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
-    public function sendMessage($message, $messageGroupId = NULL)
+    public function sendMessage(SendMessageRequest $messageRequest)
     {
+        $this->sendToS3($messageRequest);
 
+        $messageRequest->withQueueUrl($this->config->getSqsUrl() ?: $messageRequest->getQueueUrl());
+
+        return $this->getSqsClient()->sendMessage($this->formatMessage($messageRequest));
+    }
+
+    private function formatMessage(SendMessageRequest $messageRequest): array
+    {
+        $request = [
+            'QueueUrl' => $messageRequest->getQueueUrl(),
+            'MessageBody' => $messageRequest->getMessageBody()
+        ];
+        $request += $messageRequest->getDelaySeconds() ? ['DelaySeconds' => $messageRequest->getDelaySeconds()] : [];
+        $request += $messageRequest->getDelaySeconds() ? ['MessageAttributes' => $messageRequest->getMessageAttributes()] : [];
+
+        if ($messageRequest->getMessageGroupId()) {
+            $request += [
+                'MessageGroupId' => $messageRequest->getMessageGroupId(),
+                'MessageDeduplicationId' => $messageRequest->getMessageDeduplicationId()
+            ];
+        }
+        return $request;
+    }
+
+    /**
+     * @param SendMessageRequest $messageRequest
+     * @throws \Exception
+     */
+    public function sendToS3(SendMessageRequest $messageRequest): void
+    {
         switch ($this->config->getSendToS3()) {
             case ConfigInterface::ALWAYS:
                 $use_sqs = FALSE;
                 break;
 
             case ConfigInterface::IF_NEEDED:
-                $use_sqs = !$this->isTooBig($message);
+                $use_sqs = !$this->isTooBig($messageRequest->getMessageBody());
                 break;
 
             default:
@@ -190,34 +221,10 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
             $receipt = $this->getS3Client()->upload(
                 $this->config->getBucketName(),
                 $key,
-                $message
+                $messageRequest->getMessageBody()
             );
             // Swap the message for a pointer to the actual message in S3.
-            $message = (string)(new S3Pointer($this->config->getBucketName(), $key, $receipt));
+            $messageRequest->withMessageBody((string)(new S3Pointer($this->config->getBucketName(), $key, $receipt)));
         }
-
-        $queue_url = $this->config->getSqsUrl();
-
-        $messageRequest = [
-            'QueueUrl' => $queue_url,
-            'MessageBody' => $message
-        ];
-
-        $messageRequest = [];
-        if ($messageGroupId){
-            $messageRequest = [
-                'QueueUrl' => $queue_url,
-                'MessageBody' => $message,
-                'MessageGroupId' => $messageGroupId,
-                'MessageDeduplicationId' => base64_encode($messageGroupId)
-            ];
-        } else {
-            $messageRequest = [
-                'QueueUrl' => $queue_url,
-                'MessageBody' => $message
-            ];
-        }
-
-        return $this->getSqsClient()->sendMessage($messageRequest);
     }
 }
