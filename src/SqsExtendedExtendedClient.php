@@ -209,7 +209,7 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
                 'QueueUrl' => $queue_url,
                 'MessageBody' => $message,
                 'MessageGroupId' => $messageGroupId,
-                'MessageDeduplicationId' => $messageGroupId . "Extended"
+                'MessageDeduplicationId' => base64_encode($messageGroupId)
             ];
         } else {
             $messageRequest = [

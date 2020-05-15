@@ -49,7 +49,8 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
-            'MessageGroupId' => 'groupId'
+            'MessageGroupId' => 'groupId',
+            'MessageDeduplicationId'=> base64_encode('groupId')
         ], $response);
     }
 
@@ -72,12 +73,14 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
-            'MessageGroupId' => 'groupId'],
+            'MessageGroupId' => 'groupId',
+            'MessageDeduplicationId'=> base64_encode('groupId')],
             $response);
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
-            'MessageGroupId' => 'groupId'],
+            'MessageGroupId' => 'groupId',
+            'MessageDeduplicationId'=> base64_encode('groupId')],
             $responseToBig);
     }
 
@@ -100,8 +103,8 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
-            'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
-            'MessageGroupId' => NULL],
+            'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]'
+        ],
             $response);
     }
 
