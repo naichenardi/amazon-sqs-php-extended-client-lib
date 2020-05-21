@@ -218,7 +218,8 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
                 break;
         }
 
-//        $messageRequest->addNumberMessageAttribute(mb_strlen($messageRequest->getMessageBody()));
+        $messageRequest->addNumberMessageAttribute(self::RESERVED_ATTRIBUTE_NAME, mb_strlen($messageRequest->getMessageBody()));
+
         $use_sqs = $use_sqs || !$this->config->getBucketName();
         if (!$use_sqs) {
             // First send the object to S3. The modify the message to store an S3
