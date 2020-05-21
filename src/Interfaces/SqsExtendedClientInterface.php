@@ -1,9 +1,11 @@
 <?php
 
-namespace AwsExtended;
+namespace AwsExtended\Interfaces;
 
 use Aws\ResultInterface;
 use Aws\S3\S3Client;
+use AwsExtended\Model\SendMessageRequest;
+use AwsExtended\SqsExtendedExtendedClient;
 
 interface SqsExtendedClientInterface {
 

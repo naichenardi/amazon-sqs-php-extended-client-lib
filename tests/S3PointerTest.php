@@ -1,23 +1,26 @@
 <?php
 
-namespace AwsExtended;
 
 use Aws\Result;
-use Aws\ResultInterface;
+use \AwsExtended\Infrastructure\S3Pointer;
 
 /**
  * Class S3PointerTest.
  *
  * @package AwsExtended
  *
- * @coversDefaultClass \AwsExtended\S3Pointer
+ * @coversDefaultClass \AwsExtended\Infrastructure\S3Pointer
  */
 class S3PointerTest extends \PHPUnit_Framework_TestCase {
 
-  /**
-   * @covers ::__toString
-   * @dataProvider toStringProvider
-   */
+    /**
+     * @covers ::__toString
+     * @dataProvider toStringProvider
+     * @param $bucket
+     * @param $key
+     * @param $receipt
+     * @param $expected
+     */
   public function testToString($bucket, $key, $receipt, $expected) {
     $pointer = $receipt ?
       new S3Pointer($bucket, $key, $receipt) :

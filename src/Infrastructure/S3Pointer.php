@@ -1,6 +1,6 @@
 <?php
 
-namespace AwsExtended;
+namespace AwsExtended\Infrastructure;
 
 use Aws\ResultInterface;
 
@@ -23,7 +23,7 @@ class S3Pointer {
   /**
    * The transaction response.
    *
-   * @var \Aws\ResultInterface
+   * @var ResultInterface
    */
   protected $s3Result;
 
@@ -35,7 +35,7 @@ class S3Pointer {
    *   The name of the bucket to point to.
    * @param $key
    *   The name of the document in S3.
-   * @param \Aws\ResultInterface $s3_result
+   * @param ResultInterface $s3_result
    *   The response from the S3 operation that saved to object.
    */
   public function __construct($bucket_name, $key, ResultInterface $s3_result = NULL) {
@@ -62,7 +62,7 @@ class S3Pointer {
   /**
    * Checks if a result response is an S3 pointer.
    *
-   * @param \Aws\ResultInterface $result
+   * @param ResultInterface $result
    *   The result from the SQS request.
    *
    * @return bool

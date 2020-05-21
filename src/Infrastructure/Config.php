@@ -1,6 +1,8 @@
 <?php
 
-namespace AwsExtended;
+namespace AwsExtended\Infrastructure;
+
+use AwsExtended\Interfaces\ConfigInterface;
 
 class Config implements ConfigInterface {
 
