@@ -6,7 +6,8 @@
   "require": {
     "php": ">=7.1.0",
     "aws/aws-sdk-php": "^3.18",
-    "ramsey/uuid": "^3.4"
+    "ramsey/uuid": "^3.4",
+    "ext-json": "*"
   },
   "require-dev": {
     "phpunit/phpunit": "^5.7",

@@ -1,20 +1,23 @@
 <?php
 
-namespace AwsExtended;
-
+use \AwsExtended\Infrastructure\Config;
 /**
  * Class ConfigTest.
  *
  * @package AwsExtended
  *
- * @coversDefaultClass \AwsExtended\Config
+ * @coversDefaultClass Config
  */
 class ConfigTest extends \PHPUnit_Framework_TestCase {
 
-  /**
-   * @covers ::__construct
-   * @dataProvider constructorProvider
-   */
+    /**
+     * @covers ::__construct
+     * @dataProvider constructorProvider
+     * @param $args
+     * @param $bucket_name
+     * @param $sqs_url
+     * @param $send_to_s3
+     */
   public function testConstructor($args, $bucket_name, $sqs_url, $send_to_s3) {
     $configuration = new Config($args, $bucket_name, $sqs_url, $send_to_s3);
     $this->assertSame($args, $configuration->getConfig());

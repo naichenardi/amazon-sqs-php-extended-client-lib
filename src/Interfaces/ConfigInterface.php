@@ -1,6 +1,6 @@
 <?php
 
-namespace AwsExtended;
+namespace AwsExtended\Interfaces;
 
 interface ConfigInterface {
 

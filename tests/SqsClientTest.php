@@ -1,24 +1,28 @@
 <?php
 
-namespace AwsExtended;
 
 use Aws\Result;
 use Aws\S3\S3Client;
 use Aws\Sqs\SqsClient as AwsSqsClient;
+use AwsExtended\Infrastructure\Config;
+use AwsExtended\Interfaces\ConfigInterface;
+use AwsExtended\Application\SqsExtendedExtendedClient;
+use AwsExtended\Interfaces\SqsExtendedClientInterface;
+use AwsExtended\Model\SendMessageRequest;
 use Prophecy\Argument;
 
 /**
  * Class SqsClientTest.
  *
- * @package AwsExtended
+ * @package AwsExtended\Application
  *
- * @coversDefaultClass \AwsExtended\SqsExtendedExtendedClient
+ * @coversDefaultClass SqsExtendedExtendedClient
  */
 class SqsClientTest extends \PHPUnit_Framework_TestCase
 {
 
     /**
-     * @var \AwsExtended\SqsExtendedClientInterface
+     * @var SqsExtendedClientInterface
      */
     protected $client;
 
@@ -55,7 +59,7 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> $this->messageGroupId . time()
+            'MessageDeduplicationId' => $this->messageGroupId . time()
         ], $response);
     }
 
@@ -88,13 +92,13 @@ class SqsClientTest extends \PHPUnit_Framework_TestCase
             'QueueUrl' => 'queue.name',
             'MessageBody' => '{"name":"Donald Trump","country":"USA"}',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> $this->messageGroupId . time()],
+            'MessageDeduplicationId' => $this->messageGroupId . time()],
             $response);
         $this->assertEquals([
             'QueueUrl' => 'queue.name',
             'MessageBody' => '[[{"Lorem":"bucket-name","Ipsum":"1234-fake-uuid.json"},"fake_object_url"],{"s3BucketName":"bucket-name","s3Key":"1234-fake-uuid.json"}]',
             'MessageGroupId' => 'groupId',
-            'MessageDeduplicationId'=> $this->messageGroupId . time()],
+            'MessageDeduplicationId' => $this->messageGroupId . time()],
             $responseToBig);
     }
 

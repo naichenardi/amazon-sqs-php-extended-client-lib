@@ -1,9 +1,13 @@
 <?php
 
-namespace AwsExtended;
+namespace AwsExtended\Application;
 
 use Aws\S3\S3Client;
 use Aws\Sdk;
+use AwsExtended\Infrastructure\S3Pointer;
+use AwsExtended\Interfaces\ConfigInterface;
+use AwsExtended\Interfaces\SqsExtendedClientInterface;
+use AwsExtended\Model\SendMessageRequest;
 use Ramsey\Uuid\Uuid;
 
 /**
@@ -13,7 +17,7 @@ use Ramsey\Uuid\Uuid;
  */
 class SqsExtendedExtendedClient implements SqsExtendedClientInterface
 {
-
+    const RESERVED_ATTRIBUTE_NAME = "SQSLargePayloadSize";
     /**
      * The AWS client to push messages to SQS.
      *
@@ -213,6 +217,9 @@ class SqsExtendedExtendedClient implements SqsExtendedClientInterface
                 $use_sqs = TRUE;
                 break;
         }
+
+        $messageRequest->addNumberMessageAttribute(self::RESERVED_ATTRIBUTE_NAME, mb_strlen($messageRequest->getMessageBody()));
+
         $use_sqs = $use_sqs || !$this->config->getBucketName();
         if (!$use_sqs) {
             // First send the object to S3. The modify the message to store an S3

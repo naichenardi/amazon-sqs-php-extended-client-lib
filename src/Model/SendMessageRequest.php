@@ -1,8 +1,10 @@
 <?php
 
 
-namespace AwsExtended;
+namespace AwsExtended\Model;
 
+
+use AwsExtended\Exceptions\AttributeAlreadyExistException;
 
 /**
  * Class SendMessageRequest
@@ -17,6 +19,10 @@ namespace AwsExtended;
  */
 class SendMessageRequest
 {
+    const STRING = 'String';
+    const BINARY = 'Binary';
+    const NUMBER = 'Number';
+
     private $queueUrl;
     private $messageBody;
     private $delaySeconds;
@@ -28,6 +34,7 @@ class SendMessageRequest
     {
         $this->queueUrl = $queueUrl;
         $this->messageBody = $messageBody;
+        $this->messageAttributes = [];
     }
 
     /**
@@ -115,4 +122,32 @@ class SendMessageRequest
         return $this;
     }
 
+    public function addStringMessageAttribute(string $attribute, string $value)
+    {
+        $this->addAttribute(self::STRING, $attribute, $value);
+    }
+
+    public function addBinaryMessageAttribute(string $attribute, string $value)
+    {
+        $this->addAttribute(self::BINARY, $attribute, $value);
+    }
+
+    public function addNumberMessageAttribute(string $attribute, string $value)
+    {
+        $this->addAttribute(self::NUMBER, $attribute, $value);
+    }
+
+    private function addAttribute(string $type, string $attribute, string $value)
+    {
+        if (array_key_exists($attribute, $this->getMessageAttributes())) {
+            throw new AttributeAlreadyExistException($attribute);
+        }
+
+        $this->messageAttributes += [
+            $attribute => [
+                'DataType' => $type,
+                'StringValue' => $value
+            ]
+        ];
+    }
 }
